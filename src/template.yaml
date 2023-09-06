@@ -77,42 +77,6 @@ Resources:
           PARTNER_DDB_TABLE: !Ref PartnerDDBTable
 
 
-  #Update with State Machine
-  ManagePartnerStateMachine:
-    Type: AWS::Serverless::StateMachine 
-    Properties:
-      DefinitionUri: statemachine/managePartners.yaml
-      Tracing:
-        Enabled: true
-      DefinitionSubstitutions: #Replace these
-        AuroraARN: !Ref AuroraARN
-        DDBTable: !Ref PartnerDDBTable
-        CognitoUserPool: !Ref CognitoUserPool
-      Policies: 
-        - LambdaInvokePolicy:
-            FunctionName: !Ref GenerateRefernceNumber
-        - DynamoDBWritePolicy:
-            TableName: !Ref FormDataTable
-        - ComprehendBasicAccessPolicy: {} 
-        # CW Logs Policy
-        -  Version: "2012-10-17"
-           Statement:
-             - Effect: Allow
-               Action:
-                 - "cloudwatch:*"
-                 - "logs:*"
-               Resource: "*"
-        - SESCrudPolicy:
-            IdentityName: !Ref ValidatedEmail 
-      Type: EXPRESS
-      Logging:
-        Destinations:
-          - CloudWatchLogsLogGroup:
-              LogGroupArn: !GetAtt StateMachineLogGroup.Arn
-        IncludeExecutionData: false
-        Level: 'ALL'
-
-
   CustomizeUnicornFunction:
     Type: AWS::Serverless::Function
     Properties:
